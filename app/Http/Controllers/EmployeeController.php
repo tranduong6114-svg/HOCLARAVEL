@@ -8,15 +8,20 @@ use App\Models\Department;
 use App\Models\Position;
 use App\Models\Project;
 use App\Http\Requests\StoreEmployeeRequest;
+use App\Services\EmployeeService;
 
 class EmployeeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $employeeService;
+
+    public function __construct(EmployeeService $employeeService)
+    {
+        $this->employeeService = $employeeService;
+    }
+
     public function index()
     {
-        $employees = Employee::with(['department', 'position', 'projects'])->paginate(5);
+        $employees = $this->employeeService->getPaginatedEmployees(5);
         return view('employees.index', compact('employees'));
     }
 
@@ -34,17 +39,8 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request)
     {
-        $request->validate([
-            'employee_code' => 'required|unique:employees',
-            'full_name' => 'required',
-            'email' => 'required|email|unique:employees',
-            'base_salary' => 'required|numeric',
-            'department_id' => 'required',
-            'position_id' => 'required',
-            'project_ids' => 'nullable|array'
-        ]);
         $employee = Employee::create($request->all());
         if ($request->has('project_ids')) {
             $employee->projects()->attach($request->project_ids);
@@ -57,7 +53,8 @@ class EmployeeController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $employee = $this->employeeService->getEmployeeDetails($id);
+        return view('employees.show', compact('employee'));
     }
 
     /**
@@ -81,7 +78,7 @@ class EmployeeController extends Controller
      */
     public function destroy(string $id)
     {
-        $employee = Employee::findOrFail($id);
+        $employee = Employee::find($id);
         $employee->delete();
         return redirect()->route('employees.index')->with('success', 'Đã xóa nhân viên!');
     }

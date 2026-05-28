@@ -18,6 +18,15 @@
         @error('email') <span style="color: red; font-size: 12px;">{{ $message }}</span> @enderror
     </div>
 
+    <div style="margin-bottom: 15px;">
+    <label for="phone">Số điện thoại (Định dạng: xxxx-xxx-xxx):</label><br>
+    <input type="text" name="phone" id="phone" value="{{ old('phone') }}">
+    
+    @error('phone')
+        <span style="color: red; font-size: 14px;">{{ $message }}</span>
+    @enderror
+    </div>
+    
     <div style="margin-bottom: 10px;">
         <p>Lương cơ bản: <input type="number" name="base_salary" value="{{ old('base_salary') }}"></p>
         @error('base_salary') <span style="color: red; font-size: 12px;">{{ $message }}</span> @enderror

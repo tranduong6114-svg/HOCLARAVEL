@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\PhoneNumberFormat;
 
 class StoreEmployeeRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class StoreEmployeeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -30,7 +31,8 @@ class StoreEmployeeRequest extends FormRequest
             'department_id' => 'required|exists:departments,id',
             'position_id'   => 'required|exists:positions,id',
             'project_ids'   => 'nullable|array',
-            'project_ids.*' => 'exists:projects,id'
+            'project_ids.*' => 'exists:projects,id',
+            'phone' => ['required', new PhoneNumberFormat()]
         ];
     }
 

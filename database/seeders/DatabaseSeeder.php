@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\NhanVien;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\Project;
