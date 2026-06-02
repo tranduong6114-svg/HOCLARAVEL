@@ -9,6 +9,8 @@ use App\Models\Position;
 use App\Models\Project;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Services\EmployeeService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -76,10 +78,23 @@ class EmployeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        $employee = Employee::find($id);
-        $employee->delete();
-        return redirect()->route('employees.index')->with('success', 'Đã xóa nhân viên!');
+        try {
+            $employee = \App\Models\Employee::findOrFail($id);
+            $empName = $employee->full_name; 
+            
+            $employee->delete();
+            
+            $userName = Auth::check() ? Auth::user()->name : 'Hệ thống';
+            Log::info("Nhân viên [{$empName}] đã bị xóa bởi: {$userName}");
+
+            return redirect()->route('employees.index')->with('success', 'Đã xóa nhân viên!');
+
+        } catch (\Exception $e) {
+            Log::error("Lỗi sập DB khi xóa NV ID {$id}: " . $e->getMessage());
+
+            return redirect()->route('employees.index')->with('error', 'Hệ thống đang bận, không thể xóa lúc này!');
+        }
     }
 }
