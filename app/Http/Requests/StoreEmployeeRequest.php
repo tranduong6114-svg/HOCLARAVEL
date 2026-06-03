@@ -32,7 +32,7 @@ class StoreEmployeeRequest extends FormRequest
             'position_id'   => 'required|exists:positions,id',
             'project_ids'   => 'nullable|array',
             'project_ids.*' => 'exists:projects,id',
-            'phone' => ['required', new PhoneNumberFormat()]
+            'phone' => ['nullable', new PhoneNumberFormat()]
         ];
     }
 

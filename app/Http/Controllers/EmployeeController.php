@@ -11,6 +11,8 @@ use App\Http\Requests\StoreEmployeeRequest;
 use App\Services\EmployeeService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\SendWelcomeEmailJob;
+use App\Notifications\NewEmployeeNotification;
 
 class EmployeeController extends Controller
 {
@@ -44,9 +46,18 @@ class EmployeeController extends Controller
     public function store(StoreEmployeeRequest $request)
     {
         $employee = Employee::create($request->all());
+        
         if ($request->has('project_ids')) {
             $employee->projects()->attach($request->project_ids);
         }
+
+        SendWelcomeEmailJob::dispatch($employee);
+
+        $admin = Auth::user();
+        if ($admin) {
+            $admin->notify(new NewEmployeeNotification($employee));
+        }
+        
         return redirect()->route('employees.index')->with('success', 'Thêm nhân viên thành công!');
     }
 
